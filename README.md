@@ -1,5 +1,6 @@
 # Stop-Start-Recording-Atem-Mini
-The PyATEMMax-based ATEM Mini Auto Recorder is a developer-focused software that automates video recording on ATEM Mini video switchers. It streamlines the recording process for developers, ensuring efficient and accurate capture of important moments.
+ATEM Mini Auto Recorder: Simplifying ATEM Mini setup, automating video recording with PyATEMMax Python library. Ideal for developers seeking an intuitive way to start using ATEM Mini.
+
 
 # pyenv enviroment instructions
 1. Make sure you are in the root folder and run the following commands
