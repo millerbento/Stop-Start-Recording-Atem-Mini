@@ -1,12 +1,8 @@
-from modules.connectToAtem import connectToAtem
+from modules.startAndStopRecording import startAndStopRecording
 
-switcherConnected = connectToAtem()
+#startRecording or stopRecording
+action = 'startRecording'
+#action = 'stopRecording'
 
-if switcherConnected:
-    isRecording = switcherConnected.macro.recordingStatus.isRecording
-    if isRecording:
-        switcherConnected.execMacroStopRecording()
-    else:
-        switcherConnected.execMacroRecord()
-else:
-    print('The system cannot connect to the Atem')
+result = startAndStopRecording(action)
+print(result)

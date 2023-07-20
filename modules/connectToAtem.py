@@ -9,7 +9,7 @@ def connectToAtem():
 
     switcher = PyATEMMax.ATEMMax()
     switcher.connect(atem)
-    connected = switcher.waitForConnection(timeout=2.5)    
+    connected = switcher.waitForConnection(timeout=5)    
 
     if connected:
         return switcher
