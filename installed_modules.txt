@@ -1,5 +1,0 @@
-Package    Version
----------- -------
-pip        23.1.2
-PyATEMMax  1.0b9
-setuptools 58.1.0
