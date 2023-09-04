@@ -3,21 +3,35 @@
 #include "SwitcherConnection.h" // Include the switcher connection functions
 #include <cstdio>
 #include <ctime>
+#include <cstring> // Include for strcmp
 
 class SwitcherController {
+private:
+    IBMDSwitcher* switcher;
+
+    HRESULT ConnectToSwitcher() {
+        BMDSwitcherConnectToFailure connectToFailReason;
+        return ::ConnectToSwitcher(switcher, connectToFailReason);
+    }
+
 public:
-    SwitcherController() {}
+    SwitcherController() : switcher(nullptr) {}
+
+    ~SwitcherController() {
+        if (switcher) {
+            switcher->Release();
+            switcher = nullptr;
+        }
+    }
 
     int Run() {
         HRESULT result;
 
         // Use the discovery instance to connect to the switcher
         simpleConsoleLog("Connecting to switcher...");
-        IBMDSwitcher* switcher;
-        BMDSwitcherConnectToFailure connectToFailReason;
 
         // Call the ConnectToSwitcher function to establish the connection
-        result = ConnectToSwitcher(switcher, connectToFailReason);
+        result = ConnectToSwitcher();
 
         if (result != S_OK) {
             simpleConsoleLog("Failed to connect to switcher! :/");
@@ -26,7 +40,7 @@ public:
             simpleConsoleLog("Connected to switcher! :)");
 
             // Start recording
-            result = StartRecording(switcher);
+            result = StartRecording();
             if (result == S_OK) {
                 simpleConsoleLog("Recording started!");
 
@@ -37,7 +51,7 @@ public:
                 }
 
                 // Stop recording
-                result = StopRecording(switcher);
+                result = StopRecording();
                 if (result == S_OK) {
                     simpleConsoleLog("Recording stopped!");
                 } else {
@@ -47,11 +61,32 @@ public:
                 simpleConsoleLog("Failed to start recording!");
             }
 
-            // Don't forget to release the switcher interface and perform necessary cleanup.
-            switcher->Release();
-
             return 0;
         }
+    }
+
+    HRESULT StartRecording() {
+        // Connect to the switcher if not already connected
+        if (!switcher) {
+            HRESULT connectResult = ConnectToSwitcher();
+            if (connectResult != S_OK) {
+                return connectResult;
+            }
+        }
+
+        return ::StartRecording(switcher);
+    }
+
+    HRESULT StopRecording() {
+        // Connect to the switcher if not already connected
+        if (!switcher) {
+            HRESULT connectResult = ConnectToSwitcher();
+            if (connectResult != S_OK) {
+                return connectResult;
+            }
+        }
+
+        return ::StopRecording(switcher);
     }
 };
 
@@ -60,8 +95,14 @@ int main() {
     return controller.Run();
 }
 
-// Since ctypes can only talk to C functions, we need to provide those declaring them as extern "C"
+// Declare the StartRecording and StopRecording functions as extern "C" to expose them to C
 extern "C" {
     SwitcherController* SwitcherController_new() { return new SwitcherController(); }
     void SwitcherController_Run(SwitcherController* SwitcherController) { SwitcherController->Run(); }
+    HRESULT SwitcherController_StartRecording(SwitcherController* controller) {
+        return controller->StartRecording();
+    }
+    HRESULT SwitcherController_StopRecording(SwitcherController* controller) {
+        return controller->StopRecording();
+    }
 }
